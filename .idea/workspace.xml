@@ -7,7 +7,17 @@
     <list default="true" id="e57f8aaa-404c-4732-a417-9fa1c6e080a5" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/M2_Project.ipynb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/absences_by_gender.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/absences_by_gender.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/age_by_gender.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/age_by_gender.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/age_by_parent_status.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/age_by_parent_status.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gender_distribution.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/gender_distribution.pdf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/student-analysis-project.py" beforeDir="false" afterPath="$PROJECT_DIR$/student-analysis-project.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/success_by_absences.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/success_by_absences.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/success_by_alcohol.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/success_by_alcohol.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/success_by_famrel.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/success_by_famrel.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/success_by_goout.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/success_by_goout.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/success_by_internet.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/success_by_internet.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/success_by_studytime.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/success_by_studytime.pdf" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
