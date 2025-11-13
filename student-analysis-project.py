@@ -20,15 +20,15 @@ import csv
 # Getting familiar with the dataset
 #================================================================================#
 
-students = pd.read_csv(
+students_raw = pd.read_csv(
     "/Users/yesminehachana/Desktop/Classes/Dauphine/2nd Year/1st Semester/Python/Student Performance Analysis Project/students.csv",  sep=",", quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
-print(students.head())
+print(students_raw.head())
 
-print(students.shape)
-print(students.dtypes)
+print(students_raw.shape)
+print(students_raw.dtypes)
 
-students = students.rename(columns={
+students = students_raw.rename(columns={
     "Mjob": "Mother_Job",
     "Fjob": "Father_Job",
     "Pstatus": "Parent_Status",
@@ -56,6 +56,11 @@ students["Family_Size"] = students["Family_Size"].replace({
     "LE3" : "less or equal to 3",
     "GT3": "greater than 3"
 })
+
+students.to_csv(
+    "/Users/yesminehachana/Desktop/Classes/Dauphine/2nd Year/1st Semester/Python/Student Performance Analysis Project/students.csv",
+    index=False
+)
 
 #================================================================================#
 # Question 1: What is the proportion of students that failed the class?
@@ -85,7 +90,27 @@ numeric_cols = ["age", "Study_Time", "Relationship_with_family", "Go_Out",
                 "Daily_Alcohol", "Weekend_Alcohol", "health", "absences"]
 
 # Numeric variables summary (mean, median, min, max)
-numeric_summary = students[numeric_cols].agg(['mean', 'median', 'min', 'max']).T.round(2)
+
+# Select only the numerical columns
+numeric_data = students[numeric_cols]
+
+# Compute summary statistics separately
+mean_values = numeric_data.mean()
+median_values = numeric_data.median()
+min_values = numeric_data.min()
+max_values = numeric_data.max()
+
+# Combine everything into a single DataFrame
+numeric_summary = pd.DataFrame({
+    'mean': mean_values,
+    'median': median_values,
+    'min': min_values,
+    'max': max_values
+})
+
+# Round
+numeric_summary = numeric_summary.round(2)
+
 numeric_summary.to_latex("numeric_summary.tex", index=True,
                          caption="Descriptive Statistics of Numeric Variables",
                          label="tab:numeric_summary")
@@ -94,14 +119,35 @@ print(numeric_summary)
 print()
 
 # Categorical variables summary (unique values, most frequent, frequency %)
-categorical_summary = pd.DataFrame({
-    'Unique Values': [students[col].nunique() for col in categorical_cols],
-    'Most Frequent': [students[col].mode()[0] for col in categorical_cols],
-    'Frequency (%) of Most Frequent': [
-        round(students[col].value_counts(normalize=True).iloc[0] * 100, 2)
-        for col in categorical_cols
-    ]
-}, index=categorical_cols)
+
+# Create an empty dictionary to store results
+cat_summary = {
+    'Unique Values': [],
+    'Most Frequent': [],
+    'Frequency (%) of Most Frequent': []
+}
+
+# Loop through each categorical column
+for col in categorical_cols:
+    column_data = students[col] #for each categorical column (like sex), we get all values of that category
+
+    # Count how many unique values
+    unique_vals = column_data.nunique() # we count unique values for each category
+
+    # Find the most frequent value
+    most_frequent = column_data.mode()[0]   # mode() returns a list of values from most to least frequent, we take the first
+
+    # Compute the frequency of the most frequent value by category in percentage
+    freq_percent = column_data.value_counts(normalize=True).iloc[0] * 100 #iloc selects the value at position 0
+    freq_percent = round(freq_percent, 2) # we used normalize=True above to get proportions
+
+    # Store results
+    cat_summary['Unique Values'].append(unique_vals)
+    cat_summary['Most Frequent'].append(most_frequent)
+    cat_summary['Frequency (%) of Most Frequent'].append(freq_percent)
+
+# Convert to a DataFrame
+categorical_summary = pd.DataFrame(cat_summary, index=categorical_cols)
 
 print("Categorical Variables Summary:")
 print(categorical_summary)
@@ -134,19 +180,26 @@ plt.savefig("gender_distribution.pdf", format="pdf", bbox_inches="tight")
 plt.show()
 
 # Parent occupation comparison
-mother_counts = students["Mother_Job"].value_counts().reindex(
-    ["at_home", "health", "other", "services", "teacher"], fill_value=0
-)
-father_counts = students["Father_Job"].value_counts().reindex(
-    ["at_home", "health", "other", "services", "teacher"], fill_value=0
-)
 
-x = np.arange(len(mother_counts))
-width = 0.35
+# List of job categories we want to appear in the plots
+job_categories = ["at_home", "health", "other", "services", "teacher"]
+
+# Mother job counts
+mother_raw_counts = students["Mother_Job"].value_counts() # how many times each job appears for mothers
+# We create a list of counts for each job category, in the order of job_categories, 0 if one of the label is missing
+mother_counts = mother_raw_counts.reindex(job_categories, fill_value=0)
+
+# Father job counts
+father_raw_counts = students["Father_Job"].value_counts()
+father_counts = father_raw_counts.reindex(job_categories, fill_value=0)
+
+# Positions for the bars in the bar plot
+x = np.arange(len(job_categories))  # This creates an array with 5 positions for the five job categories
+width = 0.35  # width of the bars
 
 plt.figure(figsize=(8, 5))
-plt.bar(x - width/2, mother_counts, width, color="#8ecae6", label="Mother's Job")
-plt.bar(x + width/2, father_counts, width, color="#f4a261", label="Father's Job")
+plt.bar(x - width/2, mother_counts, width, color="#8ecae6", label="Mother's Job") # we move the first bar a litte to the left (to avoid overlapping)
+plt.bar(x + width/2, father_counts, width, color="#f4a261", label="Father's Job") # we move the second bar a little to the right
 
 display_labels = ["At Home", "Health", "Other", "Services", "Teacher"]
 plt.xticks(x, display_labels, rotation=15)
@@ -232,10 +285,10 @@ plt.show()
 #--------------------------------------------------------------------------------
 
 # Going out frequency vs health status comparison
-out_counts = students["Go_Out"].value_counts().sort_index()
+out_counts = students["Go_Out"].value_counts().sort_index() # we sort the values by index (1 to 5), not by frequency
 health_counts = students["health"].value_counts().sort_index()
 
-x = np.arange(1, 6)  # 1 to 5 levels
+x = np.arange(1, 6)  # produces an x axis scale from 1 to 5, for each level of the variable
 width = 0.35
 
 plt.figure(figsize=(8, 5))
@@ -302,22 +355,42 @@ categorical_vars = [
     "activities", "internet", "romantic", "success"
 ]
 
-# Create summary table by gender
-summary_by_gender = pd.DataFrame(index=vars_to_summarize)
+# Create an empty DataFrame to store the results
+summary_by_gender = pd.DataFrame(index=vars_to_summarize) # we create a data frame with each var to summarize as a row
 
-# Calculate means for numeric variables by gender
+# Separate the data into two groups
+male_students = students[students["sex"] == "Male"] # we take the rows of students where sex = male
+female_students = students[students["sex"] == "Female"]
+
+# Compute means for numeric variables
 for var in numeric_vars:
-    summary_by_gender.loc[var, "Male"] = students.loc[students["sex"] == "Male", var].mean()
-    summary_by_gender.loc[var, "Female"] = students.loc[students["sex"] == "Female", var].mean()
+    # Mean for males
+    male_mean = male_students[var].mean()
+
+    # Mean for females
+    female_mean = female_students[var].mean()
+
+    # Store the results in the summary table
+    summary_by_gender.loc[var, "Male"] = male_mean # panda create a column "Male" and assignes male_mean to each var (row)
+    summary_by_gender.loc[var, "Female"] = female_mean # loc says go to this specific row and this specific column. It creates the Male of Female column if it does not exist.
 
 # Calculate percentage of "yes" or True for categorical variables by gender
 for var in categorical_vars:
-    summary_by_gender.loc[var, "Male"] = (
-        students.loc[students["sex"] == "Male", var].isin(["yes", True]).mean() * 100
-    )
-    summary_by_gender.loc[var, "Female"] = (
-        students.loc[students["sex"] == "Female", var].isin(["yes", True]).mean() * 100
-    )
+    # Extract the column for males
+    male_values = male_students[var]
+
+    # Count "yes" or True for males
+    male_yes = male_values.isin(["yes", True]).mean() * 100
+
+    # Extract the column for females
+    female_values = female_students[var]
+
+    # Count "yes" or True for females
+    female_yes = female_values.isin(["yes", True]).mean() * 100
+
+    # Store the results in the summary table
+    summary_by_gender.loc[var, "Male"] = male_yes
+    summary_by_gender.loc[var, "Female"] = female_yes
 
 summary_by_gender = summary_by_gender.round(2)
 
@@ -329,10 +402,12 @@ print()
 print("Family Size Distribution by Gender (%):")
 print(pd.crosstab(students['sex'], students['Family_Size'], normalize='index') * 100)
 print()
+# We create a table that counts how many times combinations of sex and family size appear (crosstab)
+# We then create percentages by dividing each value by the row's total
 
 # Visualize age by gender
 plt.figure(figsize=(6, 5))
-age_by_gender = students.groupby('sex')['age'].mean()
+age_by_gender = students.groupby('sex')['age'].mean() # We group the dataset by gender, take the age column for each group, and compute the average age for males and females separately
 plt.bar(range(len(age_by_gender)), age_by_gender.values,
         color=['#8ecae6', '#f4a261'], edgecolor='black')
 plt.xticks(range(len(age_by_gender)), age_by_gender.index)
@@ -374,36 +449,51 @@ numeric_vars = [
 
 proportion_vars = ["Family_Support", "romantic", "success"]
 
-# Create summary table by parent status
+# We create empty summary table (each row is one variable to summarize)
 summary_by_parent_status = pd.DataFrame(index=vars_to_summarize)
 
-# Compute mean values for numeric variables
+# Split the data into two groups
+
+living_together = students[students["Parent_Status"] == "living together"]
+living_apart    = students[students["Parent_Status"] == "living apart"]
+
+# Means for NUMERIC variables
+
 for var in numeric_vars:
-    summary_by_parent_status.loc[var, "Living Together"] = students.loc[
-        students["Parent_Status"] == "living together", var
-    ].mean()
-    summary_by_parent_status.loc[var, "Living Apart"] = students.loc[
-        students["Parent_Status"] == "living apart", var
-    ].mean()
+    # Mean for students whose parents live together
+    mean_together = living_together[var].mean()
 
-# Compute proportions (%) for categorical variables
+    # Mean for students whose parents live apart
+    mean_apart = living_apart[var].mean()
+
+    # Store in the summary table
+    summary_by_parent_status.loc[var, "Living Together"] = mean_together
+    summary_by_parent_status.loc[var, "Living Apart"] = mean_apart
+
+# Percent "yes" / True for CATEGORICAL variables
+
 for var in proportion_vars:
-    summary_by_parent_status.loc[var, "Living Together"] = (
-        students.loc[students["Parent_Status"] == "living together", var]
-        .isin(["yes", True]).mean() * 100
-    )
-    summary_by_parent_status.loc[var, "Living Apart"] = (
-        students.loc[students["Parent_Status"] == "living apart", var]
-        .isin(["yes", True]).mean() * 100
-    )
+    # Column values for each group
+    values_together = living_together[var]
+    values_apart    = living_apart[var]
 
-# Compute most frequent category for 'guardian'
-summary_by_parent_status.loc["guardian", "Living Together"] = students.loc[
-    students["Parent_Status"] == "living together", "guardian"
-].mode()[0]
-summary_by_parent_status.loc["guardian", "Living Apart"] = students.loc[
-    students["Parent_Status"] == "living apart", "guardian"
-].mode()[0]
+    # Percentage of "yes" or True in each group
+    percent_together = values_together.isin(["yes", True]).mean() * 100
+    percent_apart    = values_apart.isin(["yes", True]).mean() * 100
+
+    # Store in the summary table
+    summary_by_parent_status.loc[var, "Living Together"] = percent_together
+    summary_by_parent_status.loc[var, "Living Apart"] = percent_apart
+
+# Most frequent 'guardian' for each group
+
+guardian_together = living_together["guardian"].mode()[0]
+guardian_apart    = living_apart["guardian"].mode()[0]
+
+summary_by_parent_status.loc["guardian", "Living Together"] = guardian_together
+summary_by_parent_status.loc["guardian", "Living Apart"] = guardian_apart
+
+# Round and print
 
 summary_by_parent_status = summary_by_parent_status.round(2)
 
@@ -435,28 +525,54 @@ plt.show()
 #--------------------------------------------------------------------------------
 
 # Compute success rates by parental job type
-mother_success = (
-    students.groupby("Mother_Job")["success"]
-    .apply(lambda x: x.isin(["yes", True]).mean() * 100)
-    .reset_index()
-    .rename(columns={"success": "Success_Rate"})
-)
 
-father_success = (
-    students.groupby("Father_Job")["success"]
-    .apply(lambda x: x.isin(["yes", True]).mean() * 100)
-    .reset_index()
-    .rename(columns={"success": "Success_Rate"})
-)
+# Get list of job categories for mothers
+mother_jobs = students["Mother_Job"].unique()
+
+# Create an empty list to store results
+mother_results = []
+
+# Loop through each job type
+for job in mother_jobs:
+    # Select students whose mother has this job
+    subset = students[students["Mother_Job"] == job] # for each job, it says if mother job is this job or not (true, false), then it only keeps the specific job (true). It does that for each job (loop).
+    # We create a new DataFrame called subset that contains only the students whose mother has job type = job.
+
+    # Compute the % of success ("yes") in this subset (for this specific mother's job)
+    success_rate = subset["success"].isin(["yes", True]).mean() * 100
+
+    # Add the result to the list
+    mother_results.append([job, success_rate])
+
+# Convert the results into a DataFrame
+mother_success = pd.DataFrame(mother_results, columns=["Mother_Job", "Success_Rate"])
+
+# Get list of job categories for fathers
+father_jobs = students["Father_Job"].unique()
+
+# Create empty list
+father_results = []
+
+# Loop through each job type
+for job in father_jobs:
+    subset = students[students["Father_Job"] == job]
+
+    success_rate = subset["success"].isin(["yes", True]).mean() * 100
+
+    father_results.append([job, success_rate])
+
+# Convert to DataFrame
+father_success = pd.DataFrame(father_results, columns=["Father_Job", "Success_Rate"])
 
 # Visualize parental job type vs success rate
 plt.figure(figsize=(8, 5))
 x = range(len(mother_success))
 width = 0.35
 
-plt.bar([i - width/2 for i in x], mother_success["Success_Rate"],
+
+plt.bar([i - width/2 for i in x], mother_success["Success_Rate"], # we take each value i (category position) in x and shift it a bit to the left for mothers
         width=width, label="Mother's Job", color="#8ecae6")
-plt.bar([i + width/2 for i in x], father_success["Success_Rate"],
+plt.bar([i + width/2 for i in x], father_success["Success_Rate"], # we take each value i (category position) in x and shift it a bit to the right for fathers
         width=width, label="Father's Job", color="#f4a261")
 
 plt.xticks(ticks=x, labels=mother_success["Mother_Job"], rotation=30, ha="right")
@@ -725,7 +841,7 @@ plt.savefig("success_by_famrel.pdf", format="pdf", bbox_inches="tight")
 plt.show()
 
 #--------------------------------------------------------------------------------
-# PART 4.7: Summary Comparison Chart (NEW - BONUS VISUALIZATION)
+# PART 4.7: Summary Comparison Chart
 #--------------------------------------------------------------------------------
 
 # Create a summary DataFrame showing the range of success rates for each factor
@@ -789,7 +905,7 @@ print("\nFamily Relationships:")
 print(famrel_success)
 
 #--------------------------------------------------------------------------------
-# Written Conclusion
+# Written Conclusion from looking at the graphs
 #--------------------------------------------------------------------------------
 
 print("ANSWER: PRINCIPAL FACTORS IN STUDENT FAILURE")
