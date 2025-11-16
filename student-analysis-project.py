@@ -603,11 +603,28 @@ numeric_vars = [
 numeric_summary = students.groupby("Study_Time")[numeric_vars].mean().round(2)
 
 # Compute proportion (%) of success by Study_Time
-success_summary = (
-    students.groupby("Study_Time")["success"]
-    .apply(lambda x: x.isin(["yes", True]).mean() * 100)
-    .round(2)
-)
+# Get the list of Study_Time categories
+study_groups = students["Study_Time"].unique()
+
+# Create a dictionary to store the results
+success_rates = {}
+
+# Loop through each study time value
+for group in study_groups:
+    # Keep only the students who belong to this study time group
+    subset = students[students["Study_Time"] == group]
+
+    # Extract their success column (column that says if the student is successful or not)
+    values = subset["success"]
+
+    # Calculate % of yes / True (students that succeeded)
+    rate = values.isin(["yes", True]).mean() * 100
+
+    # Store the result
+    success_rates[group] = round(rate, 2)
+
+# Convert to a Pandas Series (single column of data with labels)
+success_summary = pd.Series(success_rates).sort_index()
 
 # Combine results
 count_summary = students.groupby("Study_Time")["success"].count()
@@ -615,7 +632,7 @@ summary_by_studytime = numeric_summary.copy()
 summary_by_studytime["success (%)"] = success_summary
 summary_by_studytime["count"] = count_summary
 
-# Label study time categories
+# Label study time categories: this renames the row of our summary table
 summary_by_studytime.index = ["<2 hours", "2–5 hours", "5–10 hours", ">10 hours"]
 
 # Transpose for better readability
@@ -629,35 +646,43 @@ print()
 # PART 3.5: Correlation Analysis
 #--------------------------------------------------------------------------------
 
-# Correlation heatmap (numeric variables only)
-corr = students.select_dtypes(include=['number']).corr()
-mask = np.triu(np.ones_like(corr, dtype=bool), k=1)
-
-plt.figure(figsize=(8, 6))
-sns.heatmap(corr, mask=mask, annot=True, fmt=".2f", cmap="coolwarm",
-            square=True, cbar_kws={"shrink": 0.8})
-plt.title("Correlation Heatmap - Numeric Variables (Lower Triangle)", fontsize=13)
-plt.tight_layout()
-plt.savefig("correlation_heatmap_numeric.pdf", format="pdf", bbox_inches="tight")
-plt.show()
-
-# Full correlation heatmap (including encoded binary variables)
+# Make a copy so we don't change the original data
 students_corr = students.copy()
-binary_map = {
-    "yes": 1, "no": 0, True: 1, False: 0,
-    "Male": 1, "Female": 0,
-    "living together": 1, "living apart": 0
-}
-binary_vars = ["School_Support", "Family_Support", "Paid_classes",
-               "activities", "internet", "romantic", "sex", "Parent_Status"]
-students_corr[binary_vars] = students_corr[binary_vars].replace(binary_map)
 
-corr = students_corr.select_dtypes(include="number").corr()
+# List of binary variables we want to turn into 0/1
+binary_vars = [
+    "School_Support", "Family_Support", "Paid_classes",
+    "activities", "internet", "romantic",
+    "sex", "Parent_Status"
+]
 
+#  Manually convert each binary variable into 0/1 so that correlations make sense numerically
+# yes/no and True/False variables
+yes_no_vars = ["School_Support", "Family_Support", "Paid_classes",
+               "activities", "internet", "romantic", "success"]
+for var in yes_no_vars:
+    # If value is "yes" or True -> 1, otherwise 0
+    students_corr[var] = students_corr[var].isin(["yes", True]).astype(int)
+
+# Sex: Male = 1, Female = 0
+students_corr["sex"] = students_corr["sex"].replace({"Male": 1, "Female": 0})
+
+# Parent status: living together = 1, living apart = 0
+students_corr["Parent_Status"] = students_corr["Parent_Status"].replace({
+    "living together": 1,
+    "living apart": 0
+})
+
+# Now select all numeric columns (original numeric + these 0/1)
+all_numeric = students_corr.select_dtypes(include=["number"])
+
+#  Compute the correlation matrix
+corr_full = all_numeric.corr()
+
+# Plot the full correlation heatmap
 plt.figure(figsize=(10, 8))
-sns.heatmap(corr, annot=True, fmt=".2f", cmap="coolwarm",
-            square=True, cbar_kws={"shrink": 0.8})
-plt.title("Correlation Heatmap - All Variables (Including Encoded Categoricals)", fontsize=13)
+sns.heatmap(corr_full, annot=True, fmt=".2f", cmap="coolwarm")
+plt.title("Correlation Heatmap - All Variables (Including Encoded Categoricals)")
 plt.tight_layout()
 plt.savefig("correlation_heatmap_full.pdf", format="pdf", bbox_inches="tight")
 plt.show()
@@ -680,27 +705,56 @@ numeric_vars = [
     "Weekend_Alcohol", "Go_Out", "health", "absences"
 ]
 
-# Create comparison table
+# Create comparison table skeleton
 summary_by_success = pd.DataFrame(index=vars_to_summarize)
 
-# Most frequent category for categorical variables
+# Split data into passed / failed groups
+passed_students = students[students["success"] == True]
+failed_students = students[students["success"] == False]
+
+# CATEGORICAL variables (most frequent category for each group)
 for var in categorical_vars:
-    summary_by_success.loc[var, "Passed"] = students.loc[students["success"] == True, var].mode()[0]
-    summary_by_success.loc[var, "Failed"] = students.loc[students["success"] == False, var].mode()[0]
+    # Most frequent value among passed students
+    passed_mode = passed_students[var].mode()[0]
 
-# Proportion (%) of "yes" for binary variables
+    # Most frequent value among failed students
+    failed_mode = failed_students[var].mode()[0]
+
+    # Store in the table
+    summary_by_success.loc[var, "Passed"] = passed_mode
+    summary_by_success.loc[var, "Failed"] = failed_mode
+
+# BINARY variables (percentage of "yes" / True)
 for var in binary_vars:
-    summary_by_success.loc[var, "Passed"] = (
-        students.loc[students["success"] == True, var].isin(["yes", True]).mean() * 100
-    )
-    summary_by_success.loc[var, "Failed"] = (
-        students.loc[students["success"] == False, var].isin(["yes", True]).mean() * 100
-    )
+    # Values for passed students
+    passed_values = passed_students[var]
+    # Values for failed students
+    failed_values = failed_students[var]
 
-# Mean for numeric variables
+    # Percentage of yes/True among passed
+    passed_yes_pct = passed_values.isin(["yes", True]).mean() * 100
+
+    # Percentage of yes/True among failed
+    failed_yes_pct = failed_values.isin(["yes", True]).mean() * 100
+
+    # Store in the table
+    summary_by_success.loc[var, "Passed"] = passed_yes_pct
+    summary_by_success.loc[var, "Failed"] = failed_yes_pct
+
+# NUMERIC variables (mean value in each group)
+
 for var in numeric_vars:
-    summary_by_success.loc[var, "Passed"] = students.loc[students["success"] == True, var].mean()
-    summary_by_success.loc[var, "Failed"] = students.loc[students["success"] == False, var].mean()
+    # Average for passed students
+    passed_mean = passed_students[var].mean()
+
+    # Average for failed students
+    failed_mean = failed_students[var].mean()
+
+    # Store in the table
+    summary_by_success.loc[var, "Passed"] = passed_mean
+    summary_by_success.loc[var, "Failed"] = failed_mean
+
+# Round for display
 
 summary_by_success = summary_by_success.round(2)
 
@@ -713,16 +767,47 @@ print()
 #--------------------------------------------------------------------------------
 
 # Analyze interaction of paid classes, family support, and school support
-support_summary = (
-    students
-    .groupby(["Paid_classes", "Family_Support", "School_Support"])
-    .agg(
-        total_students=("success", "count"),
-        pass_rate=("success", lambda x: x.isin(["yes", True]).mean() * 100)
-    )
-    .reset_index()
-    .sort_values("pass_rate", ascending=False)
-)
+# Get all values that exist in each support variable
+paid_options = students["Paid_classes"].unique()
+family_options = students["Family_Support"].unique()
+school_options = students["School_Support"].unique()
+
+# Prepare an empty list to store results
+rows = []
+
+# Loop through every combination (paid classes = yes, no; family support = yes, no; school support = yes, no)
+for paid in paid_options:
+    for fam in family_options:
+        for school in school_options:
+
+            # Filter students matching this combination (we loop through each combination, for each combination we select the students who match)
+            subset = students[
+                (students["Paid_classes"] == paid) &
+                (students["Family_Support"] == fam) &
+                (students["School_Support"] == school)
+                ]
+
+            # Count students in this group
+            total = len(subset)
+
+            # If no students in this combination, we skip it
+            if total == 0:
+                continue
+
+            # Compute success rate
+            success_rate = subset["success"].isin(["yes", True]).mean() * 100
+
+            # Store this row
+            rows.append([paid, fam, school, total, success_rate])
+
+# Convert results to DataFrame
+support_summary = pd.DataFrame(rows, columns=[
+    "Paid_classes", "Family_Support", "School_Support",
+    "total_students", "pass_rate"
+])
+
+# Sort results by success rate
+support_summary = support_summary.sort_values("pass_rate", ascending=False)
 
 print("Success Rates by Support System Combinations:")
 print(support_summary.round(2))
@@ -743,7 +828,29 @@ students['absence_group'] = 'Low (0-5)'
 students.loc[students['absences'] > 5, 'absence_group'] = 'Medium (6-10)'
 students.loc[students['absences'] > 10, 'absence_group'] = 'High (>10)'
 
-absence_success = students.groupby('absence_group')['success'].apply(lambda x: (x == True).mean() * 100)
+# Get the different absence groups
+groups = students["absence_group"].unique()
+
+# Create an empty dictionary to store the results
+absence_rates = {}
+
+# Loop through each absence group
+for group in groups:
+
+    # Select only students in this group
+    subset = students[students["absence_group"] == group]
+
+    # Extract their success column
+    values = subset["success"]
+
+    # Compute the % of True (passed)
+    rate = (values == True).mean() * 100
+
+    # Store the result
+    absence_rates[group] = round(rate, 2)
+
+# Convert dictionary to a Series
+absence_success = pd.Series(absence_rates)
 
 # Order to show logical progression
 absence_order = ['Low (0-5)', 'Medium (6-10)', 'High (>10)']
@@ -763,7 +870,29 @@ plt.show()
 # PART 4.2: Success Rate by Study Time
 #--------------------------------------------------------------------------------
 
-study_success = students.groupby('Study_Time')['success'].apply(lambda x: (x == True).mean() * 100)
+# Get the list of study time categories
+study_groups = students["Study_Time"].unique()
+
+# Create a dictionary to store percentage of success
+study_rates = {}
+
+# For each study time category, calculate success rate
+for group in study_groups:
+
+    # Select students belonging to this group
+    subset = students[students["Study_Time"] == group]
+
+    # Extract only their success values
+    values = subset["success"]
+
+    # Calculate % of students who passed
+    success_rate = (values == True).mean() * 100
+
+    # Store the result
+    study_rates[group] = round(success_rate, 2)
+
+# Convert dictionary to a Pandas Series
+study_success = pd.Series(study_rates)
 
 plt.figure(figsize=(8, 5))
 plt.bar(range(len(study_success)), study_success.values, color='#8ecae6', edgecolor='black')
@@ -779,7 +908,28 @@ plt.show()
 # PART 4.3: Success Rate by Going Out Frequency
 #--------------------------------------------------------------------------------
 
-goout_success = students.groupby('Go_Out')['success'].apply(lambda x: (x == True).mean() * 100)
+# Get all levels of going out frequency
+goout_levels = students["Go_Out"].unique()
+
+# Create a dictionary to store success rates
+goout_rates = {}
+
+# Loop through each level of Go_Out
+for level in goout_levels:
+    # Select all students with this going-out level
+    subset = students[students["Go_Out"] == level]
+
+    # Extract their success values
+    success_values = subset["success"]
+
+    # Compute % of students who passed
+    success_rate = (success_values == True).mean() * 100
+
+    # Store in the dictionary
+    goout_rates[level] = round(success_rate, 2)
+
+# Convert dictionary to a pandas Series
+goout_success = pd.Series(goout_rates).sort_index()
 
 plt.figure(figsize=(8, 5))
 plt.bar(range(len(goout_success)), goout_success.values, color='#f4a261', edgecolor='black')
@@ -795,7 +945,29 @@ plt.show()
 # PART 4.4: Success Rate by Weekend Alcohol Consumption
 #--------------------------------------------------------------------------------
 
-alcohol_success = students.groupby('Weekend_Alcohol')['success'].apply(lambda x: (x == True).mean() * 100)
+# Get the different alcohol consumption levels
+alcohol_levels = students["Weekend_Alcohol"].unique()
+
+# Prepare a dictionary to store statistics
+alcohol_rates = {}
+
+# Loop through each alcohol level
+for level in alcohol_levels:
+
+    # Select only the students who have this alcohol consumption level
+    subset = students[students["Weekend_Alcohol"] == level]
+
+    # Extract their success values
+    success_values = subset["success"]
+
+    # Compute percentage of students who passed
+    success_rate = (success_values == True).mean() * 100
+
+    # Store the result
+    alcohol_rates[level] = round(success_rate, 2)
+
+# Convert dictionary to a pandas Series (sorted for display)
+alcohol_success = pd.Series(alcohol_rates).sort_index()
 
 plt.figure(figsize=(8, 5))
 plt.bar(range(len(alcohol_success)), alcohol_success.values, color='#f4a261', edgecolor='black')
@@ -811,7 +983,28 @@ plt.show()
 # PART 4.5: Success Rate by Internet Access
 #--------------------------------------------------------------------------------
 
-internet_success = students.groupby('internet')['success'].apply(lambda x: (x == True).mean() * 100)
+# Get the different internet categories (yes or no)
+internet_levels = students["internet"].unique()
+
+# Create an empty dictionary to store success rates
+internet_rates = {}
+
+# Loop through each category
+for level in internet_levels:
+    # Select only the students with this internet value
+    subset = students[students["internet"] == level]
+
+    # Extract the success column
+    success_values = subset["success"]
+
+    # Compute % of students who passed
+    success_rate = (success_values == True).mean() * 100
+
+    # Store the % rounded to two decimals
+    internet_rates[level] = round(success_rate, 2)
+
+# Convert dictionary to a Pandas Series
+internet_success = pd.Series(internet_rates)
 
 plt.figure(figsize=(6, 5))
 plt.bar(range(len(internet_success)), internet_success.values,
@@ -828,7 +1021,29 @@ plt.show()
 # PART 4.6: Success Rate by Family Relationship Quality
 #--------------------------------------------------------------------------------
 
-famrel_success = students.groupby('Relationship_with_family')['success'].apply(lambda x: (x == True).mean() * 100)
+# Get the different family relationship levels
+famrel_levels = students["Relationship_with_family"].unique()
+
+# Create an empty dictionary to store the success rates
+famrel_rates = {}
+
+# Loop through each level
+for level in famrel_levels:
+
+    # Select students with this relationship score
+    subset = students[students["Relationship_with_family"] == level]
+
+    # Extract their success values
+    success_values = subset["success"]
+
+    # Compute % of students who passed
+    success_rate = (success_values == True).mean() * 100
+
+    # Store the result, rounded
+    famrel_rates[level] = round(success_rate, 2)
+
+# Convert dictionary to a Pandas Series and sort for order 1 to 5
+famrel_success = pd.Series(famrel_rates).sort_index()
 
 plt.figure(figsize=(8, 5))
 plt.bar(range(len(famrel_success)), famrel_success.values, color='#8ecae6', edgecolor='black')
@@ -845,43 +1060,71 @@ plt.show()
 #--------------------------------------------------------------------------------
 
 # Create a summary DataFrame showing the range of success rates for each factor
-factor_ranges = pd.DataFrame({
-    'Factor': ['Going Out', 'Absences', 'Alcohol', 'Family Relations', 'Study Time', 'Internet'],
-    'Min Success Rate': [
-        goout_success.min(),
-        absence_success.min(),
-        alcohol_success.min(),
-        famrel_success.min(),
-        study_success.min(),
-        internet_success.min()
-    ],
-    'Max Success Rate': [
-        goout_success.max(),
-        absence_success.max(),
-        alcohol_success.max(),
-        famrel_success.max(),
-        study_success.max(),
-        internet_success.max()
-    ]
-})
+# Collect min and max success rates for each factor
+# For each factor, we already have a Series of success rates.
+# We now extract their minimum and maximum.
+goout_min = goout_success.min()
+goout_max = goout_success.max()
 
-factor_ranges['Impact (Range)'] = factor_ranges['Max Success Rate'] - factor_ranges['Min Success Rate']
-factor_ranges = factor_ranges.sort_values('Impact (Range)', ascending=False)
+absence_min = absence_success.min()
+absence_max = absence_success.max()
 
-# Visualize the impact of each factor
+alcohol_min = alcohol_success.min()
+alcohol_max = alcohol_success.max()
+
+famrel_min = famrel_success.min()
+famrel_max = famrel_success.max()
+
+study_min = study_success.min()
+study_max = study_success.max()
+
+internet_min = internet_success.min()
+internet_max = internet_success.max()
+
+# Build a list of rows for the summary table
+rows = [
+    ["Going Out",          goout_min,    goout_max],
+    ["Absences",           absence_min,  absence_max],
+    ["Alcohol",            alcohol_min,  alcohol_max],
+    ["Family Relations",   famrel_min,   famrel_max],
+    ["Study Time",         study_min,    study_max],
+    ["Internet",           internet_min, internet_max],
+]
+
+# Create the DataFrame from the list of rows
+factor_ranges = pd.DataFrame(
+    rows,
+    columns=["Factor", "Min Success Rate", "Max Success Rate"]
+)
+
+# Compute the impact (range = max - min)
+# Create a new column for the impact
+factor_ranges["Impact (Range)"] = (
+    factor_ranges["Max Success Rate"] - factor_ranges["Min Success Rate"]
+)
+
+# Sort factors by impact (largest first)
+factor_ranges = factor_ranges.sort_values("Impact (Range)", ascending=False)
+
+# Plot the impact of each factor (horizontal bar chart)
 plt.figure(figsize=(10, 6))
-plt.barh(range(len(factor_ranges)), factor_ranges['Impact (Range)'].values,
-         color='#8ecae6', edgecolor='black')
-plt.yticks(range(len(factor_ranges)), factor_ranges['Factor'].values)
-plt.xlabel('Impact on Success Rate (Percentage Point Difference)')
-plt.ylabel('Factor')
-plt.title('Comparison of Factor Impact on Student Success')
+# Positions on the y-axis: 0, 1, 2, ...
+positions = range(len(factor_ranges))
+# Heights: the impact values
+impacts = factor_ranges["Impact (Range)"].values
+plt.barh(positions, impacts, color="#8ecae6", edgecolor="black")
+# Label each position with the factor name
+plt.yticks(positions, factor_ranges["Factor"].values)
+plt.xlabel("Impact on Success Rate (percentage point difference)")
+plt.ylabel("Factor")
+plt.title("Comparison of Factor Impact on Student Success")
+# Invert y-axis so the biggest impact appears at the top
 plt.gca().invert_yaxis()
+
 plt.tight_layout()
 plt.savefig("factor_impact_comparison.pdf", format="pdf", bbox_inches="tight")
 plt.show()
 
-print("\nFactor Impact Summary:")
 print(factor_ranges)
 print()
 
@@ -891,17 +1134,17 @@ print()
 
 print("SUCCESS RATES SUMMARY BY FACTOR")
 
-print("\nAbsences:")
+print("Absences:")
 print(absence_success)
-print("\nStudy Time:")
+print("Study Time:")
 print(study_success)
-print("\nGoing Out:")
+print("Going Out:")
 print(goout_success)
-print("\nWeekend Alcohol:")
+print("Weekend Alcohol:")
 print(alcohol_success)
-print("\nInternet Access:")
+print("Internet Access:")
 print(internet_success)
-print("\nFamily Relationships:")
+print("Family Relationships:")
 print(famrel_success)
 
 #--------------------------------------------------------------------------------
@@ -915,7 +1158,6 @@ Based on the analysis including correlation heatmaps, comparison tables,
 and success rate visualizations, the principal factors in student failure are:
 
 TOP RISK FACTORS (factors with strongest negative impact on success):
------------------------------------------------------------------------
 1. FREQUENT GOING OUT (Most Important Risk Factor)
    - Success rate drops from 80% (very low) to 51% (very high)
    - Nearly 30 percentage point difference - the largest effect observed
@@ -942,7 +1184,6 @@ TOP RISK FACTORS (factors with strongest negative impact on success):
    - 5 percentage point difference, significant for equal opportunity
 
 PROTECTIVE FACTORS (factors that support student success):
------------------------------------------------------------
 1. LOW GOING OUT FREQUENCY
    - Students who rarely go out have 80% success rate
    - Staying focused on academics rather than socializing is protective
@@ -965,28 +1206,15 @@ PROTECTIVE FACTORS (factors that support student success):
    - Effect is modest but becomes stronger with internet access
 
 NOTES FROM CORRELATION HEATMAP:
--------------------------------
 - Going out frequency shows strong negative correlation with success
 - Alcohol consumption (both daily and weekend) negatively correlates with success
 - Weekend and daily alcohol are highly correlated with each other (0.66)
 - Age shows negative correlation, suggesting older students struggle more
 
 MOST SURPRISING FINDING:
-------------------------
 Study time alone shows only modest impact on success (70% to 74% range).
 However, from earlier analysis combining internet access and study time,
 we see that internet access amplifies the benefit of study time significantly.
-
-CONCLUSION:
------------
-The SINGLE MOST IMPORTANT risk factor for student failure is FREQUENT GOING OUT,
-with nearly a 30 percentage point drop in success rates. The second most important
-factor is HIGH ABSENCES. Together, these behavioral factors (going out and missing
-class) represent the strongest predictors of failure.
-
-Students at highest risk are those who: go out very frequently, have high absences,
-lack internet access at home, consume alcohol regularly, and have weak family support.
-Early identification of these factors can help schools provide timely interventions.
 """)
 
 # ================================================================================#
