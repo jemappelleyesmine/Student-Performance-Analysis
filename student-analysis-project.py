@@ -5,11 +5,13 @@
 # For github:
 """ pathname: cd '/Users/yesminehachana/Desktop/Classes/Dauphine/2nd Year/1st Semester/Python/Student Performance Analysis Project'"""
 
+# Aashish sent me the code he did and also reviewed and I put it on Github.
+
 #================================================================================#
 # Initialisation
 #================================================================================#
 
-# We load libraries right at the beginning.
+# We load libraries right at the beginning
 
 import numpy as np
 import pandas as pd
@@ -22,7 +24,7 @@ import csv
 # Getting familiar with the dataset
 #================================================================================#
 
-# We make the raw file usable in Python
+# We make the raw file is usable in Python
 students_raw = pd.read_csv(
     "/Users/yesminehachana/Desktop/Classes/Dauphine/2nd Year/1st Semester/Python/Student Performance Analysis Project/students.csv",  sep=",", quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
@@ -89,7 +91,7 @@ print(f"Failure rate: {fails / total * 100:.2f}%") # We get the percentage of st
 # PART 2.1: Summary Statistics Tables
 #--------------------------------------------------------------------------------
 
-# Define variable categories
+# We define variable categories
 categorical_cols = ["sex", "Family_Size", "Parent_Status", "Mother_Job",
                     "Father_Job", "guardian", "School_Support", "Family_Support",
                     "Paid_classes", "activities", "internet", "romantic", "success"]
@@ -99,7 +101,7 @@ numeric_cols = ["age", "Study_Time", "Relationship_with_family", "Go_Out",
 
 # Numeric variables summary (mean, median, min, max)
 
-# Select only the numerical columns
+# We select only the numerical columns
 numeric_data = students[numeric_cols]
 
 # Compute summary statistics separately
@@ -116,12 +118,9 @@ numeric_summary = pd.DataFrame({
     'max': max_values
 })
 
-# Round
+# We round
 numeric_summary = numeric_summary.round(2)
 
-numeric_summary.to_latex("numeric_summary.tex", index=True,
-                         caption="Descriptive Statistics of Numeric Variables",
-                         label="tab:numeric_summary")
 print("Numeric Variables Summary:")
 print(numeric_summary)
 print()
@@ -221,7 +220,7 @@ plt.show()
 
 # Gender distribution
 plt.figure(figsize=(4, 4))
-sns.countplot(data=students, x="sex", palette=["#8ecae6", "#f4a261"])
+sns.countplot(data=students, x="sex", palette=["sandybrown", "skyblue"])
 plt.title("Distribution of Students by Gender")
 plt.xlabel("Gender")
 plt.ylabel("Count")
@@ -262,9 +261,14 @@ father_counts = father_raw_counts.reindex(job_categories, fill_value=0)
 x = np.arange(len(job_categories))  # This creates an array with 5 positions for the five job categories
 width = 0.35  # width of the bars
 
+# range(len()) creates a list of numeric positions for the bars on the x-axis.
+# In this case, job_categories contains five data points.
+# Then range(5) generates the sequence 0, 1, 2 etc.
+# So range(len(absence_success)) creates the positions 0, 1, 2, 3, 4.
+
 plt.figure(figsize=(8, 5))
-plt.bar(x - width/2, mother_counts, width, color="#8ecae6", label="Mother's Job") # we move the first bar a litte to the left (to avoid overlapping)
-plt.bar(x + width/2, father_counts, width, color="#f4a261", label="Father's Job") # we move the second bar a little to the right
+plt.bar(x - width/2, mother_counts, width, color="sandybrown", label="Mother's Job") # we move the first bar a litte to the left (to avoid overlapping)
+plt.bar(x + width/2, father_counts, width, color="skyblue", label="Father's Job") # we move the second bar a little to the right
 
 display_labels = ["At Home", "Health", "Other", "Services", "Teacher"]
 plt.xticks(x, display_labels, rotation=15)
@@ -275,6 +279,9 @@ plt.legend(title="Parent Job")
 plt.tight_layout()
 plt.savefig("parent_jobs_comparison.pdf", format="pdf", bbox_inches="tight")
 plt.show()
+
+# The x-axis would just show the numbers 0, 1, 2 etc.
+# That is why we use plt.xticks() afterwards to replace these numbers with the category names.
 
 # This block of our code compares parental occupation distributions for mothers and fathers.
 # We first define a fixed order of job categories so the plot is consistent and
@@ -319,7 +326,7 @@ plt.show()
 
 # School support
 support_counts = students["School_Support"].value_counts()
-colors = ["#8ecae6" if label == "yes" else "#f4a261" for label in support_counts.index]
+colors = ["sandybrown" if label == "yes" else "skyblue" for label in support_counts.index]
 
 plt.figure(figsize=(5, 5))
 plt.pie(support_counts, labels=support_counts.index, autopct='%1.1f%%',
@@ -340,7 +347,7 @@ plt.show()
 
 # Family support
 support_counts = students["Family_Support"].value_counts()
-colors = ["#8ecae6" if label == "yes" else "#f4a261" for label in support_counts.index]
+colors = ["skyblue" if label == "yes" else "sandybrown" for label in support_counts.index]
 
 plt.figure(figsize=(5, 5))
 plt.pie(support_counts, labels=support_counts.index, autopct='%1.1f%%',
@@ -362,7 +369,7 @@ plt.show()
 
 # Paid classes
 support_counts = students["Paid_classes"].value_counts()
-colors = ["#8ecae6" if label == "yes" else "#f4a261" for label in support_counts.index]
+colors = ["skyblue" if label == "yes" else "sandybrown" for label in support_counts.index]
 
 plt.figure(figsize=(5, 5))
 plt.pie(support_counts, labels=support_counts.index, autopct='%1.1f%%',
@@ -382,7 +389,7 @@ plt.show()
 
 # Internet access
 support_counts = students["internet"].value_counts()
-colors = ["#8ecae6" if label == "yes" else "#f4a261" for label in support_counts.index]
+colors = ["skyblue" if label == "yes" else "sandybrown" for label in support_counts.index]
 
 plt.figure(figsize=(5, 5))
 plt.pie(support_counts, labels=support_counts.index, autopct='%1.1f%%',
@@ -417,8 +424,8 @@ x = np.arange(1, 6)  # produces an x axis scale from 1 to 5, for each level of t
 width = 0.35
 
 plt.figure(figsize=(8, 5))
-plt.bar(x - width/2, out_counts, width, color="#8ecae6", label="Going Out Frequency")
-plt.bar(x + width/2, health_counts, width, color="#f4a261", label="Health Status")
+plt.bar(x - width/2, out_counts, width, color="skyblue", label="Going Out Frequency")
+plt.bar(x + width/2, health_counts, width, color="sandybrown", label="Health Status")
 
 plt.xticks(x, ["Very Low", "Low", "Moderate", "High", "Very High"])
 plt.xlabel("Rating Level (1-5)")
@@ -447,9 +454,7 @@ plt.show()
 # The main finding is that going-out frequency peaks at moderate levels, and
 # health status peaks at the highest level (“Very High”). This indicates that students tend
 # to report pretty positive health overall, whereas their going-out habits are more
-# spread across low to moderately high levels. The comparison shows that the distribution
-# of health ratings is shifted upward relative to going-out ratings, suggesting that good
-# health can be quite common even among students who do not go out frequently.
+# spread across low to moderately high levels.
 
 # Alcohol consumption: daily vs weekend
 daily_counts = students["Daily_Alcohol"].value_counts().sort_index()
@@ -459,8 +464,8 @@ x = np.arange(1, 6)  # 1 to 5 levels
 width = 0.35
 
 plt.figure(figsize=(8, 5))
-plt.bar(x - width/2, daily_counts, width, color="#8ecae6", label="Daily Alcohol")
-plt.bar(x + width/2, weekend_counts, width, color="#f4a261", label="Weekend Alcohol")
+plt.bar(x - width/2, daily_counts, width, color="skyblue", label="Daily Alcohol")
+plt.bar(x + width/2, weekend_counts, width, color="sandybrown", label="Weekend Alcohol")
 
 plt.xticks(x, ["Very Low", "Low", "Moderate", "High", "Very High"])
 plt.xlabel("Alcohol Consumption Level")
@@ -587,8 +592,7 @@ print()
 # Romantic relationships are reported slightly more by females (36.1%) than males (28.3%).
 # Success rates differ: males have a higher pass rate (72.3%) than females (63.4%). Given females
 # study more and receive more support, this is interesting and worth highlighting as a “non-intuitive” result.
-# Differences are descriptive only. This table does not prove causality. It gives a first snapshot
-# of gender gaps.
+# Differences are descriptive only. This table does not prove causality.
 
 # Family size distribution by gender
 print("Family Size Distribution by Gender (%):")
@@ -612,7 +616,7 @@ print()
 plt.figure(figsize=(6, 5))
 age_by_gender = students.groupby('sex')['age'].mean() # We group the dataset by gender, take the age column for each group, and compute the average age for males and females separately
 plt.bar(range(len(age_by_gender)), age_by_gender.values,
-        color=['#8ecae6', '#f4a261'], edgecolor='black')
+        color=['skyblue', 'sandybrown'], edgecolor='black')
 plt.xticks(range(len(age_by_gender)), age_by_gender.index)
 plt.ylabel('Average Age')
 plt.xlabel('Gender')
@@ -631,7 +635,7 @@ plt.show()
 plt.figure(figsize=(6, 5))
 absences_by_gender = students.groupby('sex')['absences'].mean()
 plt.bar(range(len(absences_by_gender)), absences_by_gender.values,
-        color=['#8ecae6', '#f4a261'], edgecolor='black')
+        color=['skyblue', 'sandybrown'], edgecolor='black')
 plt.xticks(range(len(absences_by_gender)), absences_by_gender.index)
 plt.ylabel('Average Absences')
 plt.xlabel('Gender')
@@ -646,7 +650,7 @@ plt.show()
 # The x-axis shows the two gender categories, and the y-axis shows the average number of absences.
 # The results show that female students have a higher average number of absences (around 6.6)
 # compared to male students (around 5.2). This is a noticeable difference.
-# This gender gap in absenteeism may play a role in the success differences observed later.
+# This gender gap in absenteeism may play a role in the success differences.
 
 #--------------------------------------------------------------------------------
 # PART 3.2: Distributions by Parent Cohabitation Status
@@ -756,7 +760,7 @@ print()
 plt.figure(figsize=(6, 5))
 age_by_parent = students.groupby('Parent_Status')['age'].mean()
 plt.bar(range(len(age_by_parent)), age_by_parent.values,
-        color=['#f4a261', '#8ecae6'], edgecolor='black')
+        color=['sandybrown', 'skyblue'], edgecolor='black')
 plt.xticks(range(len(age_by_parent)), age_by_parent.index, rotation=15)
 plt.ylabel('Average Age')
 plt.xlabel('Parent Cohabitation Status')
@@ -825,9 +829,9 @@ x = range(len(mother_success))
 width = 0.35
 
 plt.bar([i - width/2 for i in x], mother_success["Success_Rate"], # we take each value i (category position) in x and shift it a bit to the left for mothers
-        width=width, label="Mother's Job", color="#8ecae6")
+        width=width, label="Mother's Job", color="skyblue")
 plt.bar([i + width/2 for i in x], father_success["Success_Rate"], # we take each value i (category position) in x and shift it a bit to the right for fathers
-        width=width, label="Father's Job", color="#f4a261")
+        width=width, label="Father's Job", color="sandybrown")
 
 plt.xticks(ticks=x, labels=mother_success["Mother_Job"], rotation=30, ha="right")
 plt.xlabel("Parental Job Type")
@@ -937,14 +941,13 @@ print()
 # family tends to be slightly higher for the 5–10 hour group (4.11), while the heaviest study
 # group (>10 hours) reports somewhat lower health (3.19), this possibly reflects stress or
 # overwork, although this interpretation should be treated cautiously given the smaller number
-# of students in the group (27 observations). Overall, students who invest more time in studying
-# tend to perform better academically, show
-# healthier behavioural profiles, and accumulate fewer absences, whereas limited study time is
-# associated with lower academic success.
+# of students in the group (27 observations).
 
 #--------------------------------------------------------------------------------
 # PART 3.5: Correlation Analysis
 #--------------------------------------------------------------------------------
+# The heatmap visualisation code comes from our Machine Learning class code.
+# Credit goes to our Machine Learning teacher.
 
 # Make a copy so we don't change the original data
 students_corr = students.copy()
@@ -1024,9 +1027,7 @@ plt.show()
 # meaning that no single variable in this dataset strongly predicts academic
 # achievement on its own. This includes behavioral factors (like going out or
 # drinking), socio-economic indicators (such as parental cohabitation status),
-# and support measures (such as school or family support). Overall, many factors are
-# related to one another, but none dominates the explanation of success in a
-# strong way.
+# and support measures (such as school or family support).
 
 #--------------------------------------------------------------------------------
 # PART 3.6: Success vs Multiple Factors Comparison
@@ -1134,13 +1135,6 @@ print()
 # those who passed, which may be linked to weaker academic outcomes. In contrast,
 # passed students show lower absences and a lower going-out score, which is
 # consistent with more regular attendance and potentially more stable routines.
-#
-# Overall, while family structure variables appear similar across both groups,
-# behavioral and engagement-related variables—particularly attendance, alcohol
-# consumption, and going-out frequency—show meaningful differences between
-# students who passed and those who failed. These patterns suggest that academic
-# outcomes in this dataset are more closely associated with daily habits and
-# personal behaviors than with background or demographic characteristics.
 
 #--------------------------------------------------------------------------------
 # PART 3.7: Support Systems Interaction
@@ -1193,6 +1187,35 @@ print("Success Rates by Support System Combinations:")
 print(support_summary.round(2))
 print()
 
+# This summary table examines how different combinations of support systems relate
+# to student success. We analyze three binary variables: paid private classes,
+# family support, and school-provided academic support. Each variable can take
+# the value “yes” or “no,” which creates up to eight possible combinations across
+# the three dimensions. For each combination, the code filters the dataset to
+# select only students who match that exact profile. It then calculates the total
+# number of students in this group and the percentage of them who passed, using
+# the success variable. Combinations that do not appear in the dataset are skipped.
+
+# The resulting table shows the combinations in descending order of pass rate,
+# which shows the support environments most strongly associated with higher academic success.
+# First, the highest pass rate (about 76%) is observed among students who receive paid
+# classes but do not receive family support and do not receive school support.
+# This suggests that, for this subgroup, private tutoring may compensate for the
+# lack of support in other areas. The second-highest pass rate corresponds to
+# students who receive both paid classes and family support but still do not
+# receive school support, so it reinforces the idea that paid private classes are the
+# strongest single predictor of success among the three support systems.
+#
+# Students who receive no support at all from any of the three systems still
+# achieve a pass rate of about 72%, which is higher than several combinations
+# that include support. This suggests that support variables in this dataset
+# are not straightforward predictors of academic performance. In contrast,
+# students who receive all three types of support paid classes, family support,
+# and school support show the lowest success rate (about 47%) among all
+# combinations captured in the data. This pattern may reflect that
+# students struggling the most academically are more likely
+# to receive multiple forms of support.
+
 #================================================================================#
 # QUESTION 4: Principal Factors in Student Failure
 #================================================================================#
@@ -1237,7 +1260,7 @@ absence_order = ['Low (0-5)', 'Medium (6-10)', 'High (>10)']
 absence_success = absence_success.reindex(absence_order)
 
 plt.figure(figsize=(8, 5))
-plt.bar(range(len(absence_success)), absence_success.values, color='#8ecae6', edgecolor='black')
+plt.bar(range(len(absence_success)), absence_success.values, color='skyblue', edgecolor='black')
 plt.xlabel('Number of Absences')
 plt.ylabel('Success Rate (%)')
 plt.title('Success Rate by Absences')
@@ -1245,6 +1268,30 @@ plt.xticks(range(len(absence_success)), absence_order)
 plt.tight_layout()
 plt.savefig("success_by_absences.pdf", format="pdf", bbox_inches="tight")
 plt.show()
+
+# We first group students into three categories based on how many classes they missed: “Low (0–5)” absences,
+# “Medium (6–10)” absences, and “High (>10)” absences.
+
+# These groups are created by assigning each student to a label in the new variable absence_group,
+# based on the numeric value recorded in the absences column.
+
+# After forming the three groups, we calculate the success rate within each category. Success is measured
+# using the success variable, which takes the value True for students who passed and False otherwise.
+# For each absence group, the code computes the proportion of students whose success value is True
+# and converts this into a percentage. This shows the success rate for each level of absenteeism.
+
+# The bar chart we made shows the results. The x-axis shows the three absence categories, while the y-axis
+# represents the corresponding success rates (in percentage points). Each bar height indicates how many
+# students in that absence group succeeded out of the total belonging to that group.
+
+# The pattern suggests that absenteeism relates to academic outcomes:
+# Students with low absences (0–5) have a relatively high success rate, around 68%.
+# Success is highest among students with medium absences (6–10), with a rate of approximately 76%.
+# This maybe shows that occasional absences do not penalize performance and may even correspond to
+# students who balance school attendance with other responsibilities while still performing well.
+# Students with high absences (>10) show a much lower success rate, around 56%.
+# This group performs worse, indicating maybe that frequent absenteeism is strongly associated, with poorer
+# academic results.
 
 #--------------------------------------------------------------------------------
 # PART 4.2: Success Rate by Study Time
@@ -1275,7 +1322,7 @@ for group in study_groups:
 study_success = pd.Series(study_rates)
 
 plt.figure(figsize=(8, 5))
-plt.bar(range(len(study_success)), study_success.values, color='#8ecae6', edgecolor='black')
+plt.bar(range(len(study_success)), study_success.values, color='skyblue', edgecolor='black')
 plt.xlabel('Study Time')
 plt.ylabel('Success Rate (%)')
 plt.title('Success Rate by Weekly Study Time')
@@ -1283,6 +1330,27 @@ plt.xticks(range(len(study_success)), ['<2 hrs', '2-5 hrs', '5-10 hrs', '>10 hrs
 plt.tight_layout()
 plt.savefig("success_by_studytime.pdf", format="pdf", bbox_inches="tight")
 plt.show()
+
+# In this section we analyze how weekly study time relates to student success. The
+# variable Study_Time is originally coded as an ordinal scale from 1 to 4, where
+# the categories correspond to the following weekly study durations: 1 = "<2 hours",
+# 2 = "2–5 hours", 3 = "5–10 hours", and 4 = ">10 hours".
+
+# The code loops over each study-time category, isolates the students who belong
+# to that group, and calculates the percentage of them who passed (whose
+# success value is True). These group-specific success rates are displayed in our
+# bar chart.
+
+# On the x-axis, the figure shows the four study-time categories with their
+# labels. On the y-axis, it reports the success rate in percentage terms.
+# Each bar therefore represents how likely students with that level of study
+# commitment are to pass the course.
+
+# The main result is that success rates generally improve with greater study time.
+# Students who study less than two hours per week have the lowest success rate,
+# around the low-to-mid 60% range. In contrast, the highest success rates appear
+# among students studying 2–5 hours or more than 10 hours per week, with values in
+# the 70–75% range.
 
 #--------------------------------------------------------------------------------
 # PART 4.3: Success Rate by Going Out Frequency
@@ -1312,7 +1380,7 @@ for level in goout_levels:
 goout_success = pd.Series(goout_rates).sort_index()
 
 plt.figure(figsize=(8, 5))
-plt.bar(range(len(goout_success)), goout_success.values, color='#f4a261', edgecolor='black')
+plt.bar(range(len(goout_success)), goout_success.values, color='sandybrown', edgecolor='black')
 plt.xlabel('Going Out Frequency')
 plt.ylabel('Success Rate (%)')
 plt.title('Success Rate by Going Out Frequency')
@@ -1320,6 +1388,24 @@ plt.xticks(range(len(goout_success)), ['Very Low', 'Low', 'Moderate', 'High', 'V
 plt.tight_layout()
 plt.savefig("success_by_goout.pdf", format="pdf", bbox_inches="tight")
 plt.show()
+
+# This bar chart analyzes how students’ academic success varies depending on how often they go out.
+# To compute the values shown in the graph, we first grouped students by their "Go_Out" rating, which ranges
+# from 1 (Very Low) to 5 (Very High).
+
+# For each going-out level, we selected all students who belong to that category and calculated the proportion
+# who passed the course. The success rate is the percentage of students whose "success" variable is equal to
+# True within that group.
+
+# On the graph, the x-axis displays the going-out categories in order: Very Low, Low, Moderate, High, and
+# Very High. The y-axis represents the percentage of students who passed in each category.
+
+# The main result of the plot is that academic success tends to decline as going-out frequency increases.
+# Students who rarely go out ("Very Low") have the highest success rate, while students who go out very often
+# ("Very High") have the lowest. The drop in success is gradual across categories, this could show a negative
+# relationship between social outing frequency and academic outcomes in this dataset.
+
+# This does not imply causality, but it shows a pattern.
 
 #--------------------------------------------------------------------------------
 # PART 4.4: Success Rate by Weekend Alcohol Consumption
@@ -1350,7 +1436,7 @@ for level in alcohol_levels:
 alcohol_success = pd.Series(alcohol_rates).sort_index()
 
 plt.figure(figsize=(8, 5))
-plt.bar(range(len(alcohol_success)), alcohol_success.values, color='#f4a261', edgecolor='black')
+plt.bar(range(len(alcohol_success)), alcohol_success.values, color='sandybrown', edgecolor='black')
 plt.xlabel('Weekend Alcohol Consumption')
 plt.ylabel('Success Rate (%)')
 plt.title('Success Rate by Weekend Alcohol Consumption')
@@ -1358,6 +1444,30 @@ plt.xticks(range(len(alcohol_success)), ['Very Low', 'Low', 'Moderate', 'High', 
 plt.tight_layout()
 plt.savefig("success_by_alcohol.pdf", format="pdf", bbox_inches="tight")
 plt.show()
+
+# The bar chart we made here examines how weekend alcohol consumption is associated with
+# student performance. To construct this figure, we grouped students based on their
+# level of weekend drinking, which is measured on a scale from 1 to 5 and labelled
+# as "Very Low", "Low", "Moderate", "High", and "Very High". These categories come
+# from the “Weekend_Alcohol” variable in the dataset.
+
+# For each alcohol consumption level, we selected the corresponding subset of
+# students and calculated the proportion of individuals who passed the academic
+# year. This success rate was computed as the percentage of students whose
+# “success” variable is equal to True within that group. The resulting percentages
+# were then displayed as bars in the plot.
+
+# The chart shows a non-linear relationship between weekend drinking and academic
+# success. Students with very low alcohol consumption achieve a success rate of
+# about 67%, while those with low consumption have a slightly higher success rate
+# of around 70%. The highest performance is observed among students with moderate
+# consumption, where the success rate reaches approximately 75%.
+
+# However, starting from the “High” level of weekend drinking, academic outcomes
+# decline a lot: the success rate drops to roughly 56%, marking the lowest
+# performance across the categories. Interestingly, the “Very High” consumption
+# group shows a success rate of about 66%, although this level remains below the peak
+# for moderate drinkers.
 
 #--------------------------------------------------------------------------------
 # PART 4.5: Success Rate by Internet Access
@@ -1388,7 +1498,7 @@ internet_success = pd.Series(internet_rates)
 
 plt.figure(figsize=(6, 5))
 plt.bar(range(len(internet_success)), internet_success.values,
-        color=['#f4a261', '#8ecae6'], edgecolor='black')
+        color=['sandybrown', 'skyblue'], edgecolor='black')
 plt.xlabel('Internet Access')
 plt.ylabel('Success Rate (%)')
 plt.title('Success Rate by Internet Access')
@@ -1396,6 +1506,17 @@ plt.xticks(range(len(internet_success)), internet_success.index)
 plt.tight_layout()
 plt.savefig("success_by_internet.pdf", format="pdf", bbox_inches="tight")
 plt.show()
+
+# In this graph we try to see whether students’ access to the internet is associated with differences in academic success.
+# The variable used in this analysis is internet, which is a binary categorical variable in the dataset and takes the
+# values “yes” or “no” to indicate whether the student has internet access at home.
+# To compute the statistics, our code separates students into two groups based on their internet status and then calculates
+# the success rate for each group, defined as the percentage of students whose success variable is equal to True.
+# These two success rates are then shown in a bar chart, where the x-axis represents the two categories of internet
+# access (“no” and “yes”) and the y-axis shows the corresponding success rate expressed as a percentage.
+# Students with internet access have a higher success rate than those without access. Although the
+# difference is not extremely large, it suggests that internet access may provide students with more opportunities for study.
+# Internet access may also reflect broader family socioeconomic factors that influence academic performance.
 
 #--------------------------------------------------------------------------------
 # PART 4.6: Success Rate by Family Relationship Quality
@@ -1426,7 +1547,7 @@ for level in famrel_levels:
 famrel_success = pd.Series(famrel_rates).sort_index()
 
 plt.figure(figsize=(8, 5))
-plt.bar(range(len(famrel_success)), famrel_success.values, color='#8ecae6', edgecolor='black')
+plt.bar(range(len(famrel_success)), famrel_success.values, color='skyblue', edgecolor='black')
 plt.xlabel('Quality of Family Relationships')
 plt.ylabel('Success Rate (%)')
 plt.title('Success Rate by Family Relationship Quality')
@@ -1434,6 +1555,23 @@ plt.xticks(range(len(famrel_success)), ['Very Bad', 'Bad', 'Moderate', 'Good', '
 plt.tight_layout()
 plt.savefig("success_by_famrel.pdf", format="pdf", bbox_inches="tight")
 plt.show()
+
+# This bar chart shows how student success rates vary according to the reported quality
+# of family relationships, a variable that ranges from 1 (“Very Bad”) to 5 (“Excellent”).
+# To construct this graph, we first extracted the Relationship_with_family column from the dataset,
+# which records each student’s self-assessment of family relationship quality on a five-point scale.
+# For each level, we isolated all students who selected that score and calculated the proportion
+# of students in that subgroup who passed, meaning whose success value is True.
+
+# The results reveal a non-linear pattern. Students reporting “Very Bad” family relationships
+# unexpectedly display the highest success rate (around 83%), which likely reflects the very small
+# number of observations in this category rather than a real trend. After this outlier,
+# students with “Bad” family relationships show the lowest success rate (approximately 53%),
+# indicating that negative but not extreme family tensions may be associated with weaker academic outcomes.
+
+# As relationship quality improves from “Moderate” to “Good” and “Excellent”, success rates rise steadily
+# (from around 61% to 67% and then to 74%). This general upward trend supports the interpretation that
+# stronger and more supportive family environments contribute positively to school performance.
 
 #--------------------------------------------------------------------------------
 # PART 4.7: Summary Comparison Chart
@@ -1477,7 +1615,7 @@ factor_ranges = pd.DataFrame(
     columns=["Factor", "Min Success Rate", "Max Success Rate"]
 )
 
-# Compute the impact (range = max - min)
+# Compute the impact (range equals max minus min)
 # Create a new column for the impact
 factor_ranges["Impact (Range)"] = (
     factor_ranges["Max Success Rate"] - factor_ranges["Min Success Rate"]
@@ -1486,27 +1624,30 @@ factor_ranges["Impact (Range)"] = (
 # Sort factors by impact (largest first)
 factor_ranges = factor_ranges.sort_values("Impact (Range)", ascending=False)
 
-# Plot the impact of each factor (horizontal bar chart)
 plt.figure(figsize=(10, 6))
-# Positions on the y-axis: 0, 1, 2, ...
-positions = range(len(factor_ranges))
-# Heights: the impact values
-impacts = factor_ranges["Impact (Range)"].values
-plt.barh(positions, impacts, color="#8ecae6", edgecolor="black")
-# Label each position with the factor name
-plt.yticks(positions, factor_ranges["Factor"].values)
+sns.barplot(data=factor_ranges, x="Impact (Range)", y="Factor", color="skyblue")
 plt.xlabel("Impact on Success Rate (percentage point difference)")
 plt.ylabel("Factor")
 plt.title("Comparison of Factor Impact on Student Success")
-# Invert y-axis so the biggest impact appears at the top
-plt.gca().invert_yaxis()
-
 plt.tight_layout()
 plt.savefig("factor_impact_comparison.pdf", format="pdf", bbox_inches="tight")
 plt.show()
 
 print(factor_ranges)
 print()
+
+# For each factor, we recorded  the minimum and maximum success rates observed across its different categories.
+# The difference between these two values (the “Impact (Range)” column) quantifies how strongly a given factor is associated
+# with variations in academic success. A larger range indicates that success rates vary more widely across
+# the categories of that factor.
+
+# Family relationship quality has the largest impact on student performance:
+# the success rate varies by 30 percentage points between students with very poor and those with excellent
+# family relationships. The second-largest contributor is going-out frequency, with a 29-point range,
+# showing that higher social activity correlates with a noticeable decline in success. Alcohol consumption
+# and absences also show mid level impacts (approximately 19 percentage points each), this could show that
+# both are moderately influential. Study time has a smaller range of around 10 percentage points.
+# Internet access shows the smallest difference (under 5 percentage points).
 
 #--------------------------------------------------------------------------------
 # Print Success Rates Summary
@@ -1528,10 +1669,8 @@ print("Family Relationships:")
 print(famrel_success)
 
 #--------------------------------------------------------------------------------
-# Written Conclusion from the graphs we made
+# Written conclusion from the graphs we made
 #--------------------------------------------------------------------------------
-
-print("ANSWER: PRINCIPAL FACTORS IN STUDENT FAILURE")
 
 print("""
 Based on the analysis including correlation heatmaps, comparison tables,
@@ -1540,17 +1679,16 @@ and success rate visualizations, the principal factors in student failure are:
 TOP RISK FACTORS (factors with strongest negative impact on success):
 1. FREQUENT GOING OUT (Most Important Risk Factor)
    - Success rate drops from 80% (very low) to 51% (very high)
-   - Nearly 30 percentage point difference - the largest effect observed
+   - Nearly 30 percentage point difference, the largest effect observed
    - Students who go out frequently with friends are at highest risk
 
 2. HIGH ABSENCES
    - High absences (>10): only 56% success rate
    - Low absences (0-5): 68% success rate
-   - Clear pattern: more absences = lower success
 
 3. HIGH ALCOHOL CONSUMPTION
-   - Students with high weekend alcohol consumption have ~55% success rate
-   - Those with very low consumption have ~67% success rate
+   - Students with high weekend alcohol consumption have 55% success rate
+   - Those with very low consumption have 67% success rate
    - Negative correlation visible in correlation heatmap
 
 4. POOR FAMILY RELATIONSHIPS
@@ -1561,7 +1699,7 @@ TOP RISK FACTORS (factors with strongest negative impact on success):
 5. LACK OF INTERNET ACCESS
    - No internet: 63.5% success rate
    - Has internet: 68.4% success rate
-   - 5 percentage point difference, significant for equal opportunity
+   - 5 percentage point difference
 
 PROTECTIVE FACTORS (factors that support student success):
 1. LOW GOING OUT FREQUENCY
@@ -1570,20 +1708,15 @@ PROTECTIVE FACTORS (factors that support student success):
 
 2. GOOD/EXCELLENT FAMILY RELATIONSHIPS
    - Students with excellent family relationships: 74% success rate
-   - Family support is crucial for student success
+   - Family support is important for student success
 
-3. INTERNET ACCESS AT HOME
-   - Essential resource for homework and research
-   - Particularly important when combined with adequate study time
-
-4. LOW ABSENCES
+3. LOW ABSENCES
    - Regular attendance is one of the most important factors
    - Students who attend regularly perform much better
 
-5. ADEQUATE STUDY TIME
-   - Students studying 5-10 hours or >10 hours: ~74% success rate
+4. ADEQUATE STUDY TIME
+   - Students studying 5-10 hours or >10 hours: 74% success rate
    - Students studying <2 hours: 70% success rate
-   - Effect is modest but becomes stronger with internet access
 
 NOTES FROM CORRELATION HEATMAP:
 - Going out frequency shows strong negative correlation with success
@@ -1593,21 +1726,20 @@ NOTES FROM CORRELATION HEATMAP:
 
 MOST SURPRISING FINDING WE MADE HERE:
 Study time alone shows only modest impact on success (70% to 74% range).
-However, from earlier analysis combining internet access and study time,
-we see that internet access amplifies the benefit of study time significantly.
 """)
 
 # ================================================================================#
 # QUESTION 5 (Optional): Machine Learning Classification Model
 # ================================================================================#
-# Build a simple machine learning classification model that predicts if a
+# We build a simple machine learning classification model that predicts if a
 # student will fail the class.
 #
-# We follow the methodology we learned from our Machine Learning Decision Tree lab:
-# 1. Build a default decision tree and assess overfitting
-# 2. Investigate the effect of key parameters (max_depth, min_samples_split)
-# 3. Use post-pruning with cost complexity pruning
-# 4. Use automatic model selection with GridSearchCV
+# We follow very closely the methodology we learned from our Machine Learning Decision Tree lab:
+# 1. We build a default decision tree and assess overfitting
+# 2. We investigate the effect of key parameters (max_depth, min_samples_split)
+# 3. We use automatic model selection with GridSearchCV
+
+# The code must be credited to our Machine Learning professor.
 # ================================================================================#
 
 # --------------------------------------------------------------------------------
@@ -1651,8 +1783,36 @@ X_train, X_test, Y_train, Y_test = train_test_split(
     stratify=Y
 )
 
+# We prepare the dataset for building a machine learning
+# classification model whose objective is to predict whether a student will
+# succeed or fail in the class. The target variable is "success", and all other
+# variables are used as potential predictors.
+
+# We begin by selecting all relevant features that we want the model to learn from.
+# These include demographic variables (age, sex, family size), behavioural variables
+# (study time, going-out frequency, alcohol consumption, absences), health-related
+# variables (health rating), and structural variables (parent cohabitation status,
+# school support, family support, extracurricular participation, internet access,
+# romantic relationship status). Importantly, we exclude the "success" column
+# from the feature set because it will serve as the model’s outcome variable.
+
+# Since machine learning algorithms require numerical inputs, we convert all
+# categorical variables into binary numeric codes (0/1). The mapping dictionary
+# translates yes/no variables to 1/0, Male/Female to 1/0, living together/living apart
+# to 1/0, and family size categories to 1/0. We take this method from our Machine Learning Lab.
+
+# We then convert the success variable itself into a numerical 0/1 format
+# (True = 1, False = 0).
+
+# Finally, we split the dataset into training and testing sets. The training set
+# (70% of observations) is used to fit the decision tree model, while the testing
+# set (30% of observations) is used to evaluate how well the model generalises to
+# unseen data. We use stratified sampling on Y to ensure that the proportion of
+# successful vs. unsuccessful students remains balanced across both subsets,
+# to prevent biased splits.
+
 # --------------------------------------------------------------------------------
-# PART 5.2: Default Decision Tree and Overfitting Assessment
+# PART 5.2: Default Decision Tree and Overfitting
 # --------------------------------------------------------------------------------
 
 from sklearn.tree import DecisionTreeClassifier
@@ -1673,75 +1833,171 @@ print("Default Decision Tree Performance:")
 print("  Training accuracy: {:.2f}%".format(train_accuracy * 100))
 print("  Test accuracy: {:.2f}%".format(test_accuracy * 100))
 
+# Here, we build a baseline machine learning model: a default
+# Decision Tree classifier. The goal is to evaluate how the model behaves without tuning.
+
+# We begin by importing the DecisionTreeClassifier and accuracy_score from
+# scikit-learn. The classifier is initialized with a fixed random_state to
+# get reproducibility: the same splits and the same tree structure will be
+# generated every time we run the code.
+
+# We then fit (train) the decision tree on the training dataset (X_train, Y_train).
+# At this stage, the model learns patterns and decision rules based on the
+# training students’ characteristics and outcomes.
+
+# After the model is trained, we generate predictions for both:
+# the training set (train_pred), to see how well the model fits the data it saw,
+# the test set (test_pred), to evaluate how well it generalises to new, unseen cases.
+
+# We compute accuracy for both sets using accuracy_score, which measures the
+# proportion of correct predictions.
+
+# The training accuracy is extremely high (99.59%), meaning the default decision
+# tree almost perfectly memorises the training data. However, the test accuracy is
+# much lower (55.24%). This very large gap between training and test performance
+# indicates strong overfitting: the model has learned overly complex patterns that
+# do not generalise well to new students.
+
 # --------------------------------------------------------------------------------
 # PART 5.3: Investigating the Effect of max_depth
 # --------------------------------------------------------------------------------
 
+# We define a range of possible values for the max_depth hyperparameter.
+# max_depth controls how deep the decision tree is allowed to grow.
+# A small max_depth restricts the model and reduces overfitting.
+# A very large max_depth allows the tree to memorize the training data and overfit.
 max_depths = range(1, 16)
+
+# We prepare two empty lists where we will store the accuracy
+# obtained on the training set and on the test set for each max_depth.
 train_accuracies = []
 test_accuracies = []
 
+# We loop over each possible depth value.
 for depth in max_depths:
+
+    # For each depth, we create a new DecisionTreeClassifier with that depth limit.
     dt = DecisionTreeClassifier(max_depth=depth, random_state=42)
+
+    # We train the model on the training dataset.
     dt.fit(X_train, Y_train)
 
+    # We compute the accuracy on the training set.
+    # A very high training accuracy suggests the model is fitting the training data very closely.
     train_accuracies.append(accuracy_score(Y_train, dt.predict(X_train)))
+
+    # We compute the accuracy on the test set.
+    # If test accuracy is much lower than training accuracy,
+    # this indicates overfitting: the model memorizes the training data instead of generalizing.
     test_accuracies.append(accuracy_score(Y_test, dt.predict(X_test)))
 
-# Create DataFrame for visualization
+# We put the results into a DataFrame so that seaborn can plot them.
 max_depth_results = pd.DataFrame({
     'max_depth': max_depths,
     'train': train_accuracies,
     'test': test_accuracies
 })
 
-# Plot results
+# We plot both curves (train and test accuracy) as a function of max_depth.
 plt.figure(figsize=(10, 6))
-sns.lineplot(data=max_depth_results.melt('max_depth', var_name='set', value_name='accuracy'),
-             x='max_depth', y='accuracy', hue='set', marker='o')
+
+# We “melt” the DataFrame to long format to plot both curves using a single seaborn call. This technique
+# is taken from our Decision Tree Machine Learning Lab.
+sns.lineplot(
+    data=max_depth_results.melt('max_depth', var_name='set', value_name='accuracy'),
+    x='max_depth', y='accuracy', hue='set', marker='o'
+)
+
 plt.xlabel('Maximum Depth')
 plt.ylabel('Accuracy')
 plt.title('Effect of max_depth on Model Performance')
-plt.legend(title='Dataset')
-plt.grid(True, alpha=0.3)
+plt.legend(title='Dataset')  # our legend shows which line is train vs test accuracy
+plt.grid(True, alpha=0.3)    # we add a light grid
 plt.tight_layout()
 plt.savefig("ml_max_depth_effect.pdf", format="pdf", bbox_inches="tight")
 plt.show()
+
+# This graph illustrates how the decision tree’s maximum depth affects model accuracy.
+# The blue line represents training accuracy, and it increases as max_depth grows.
+# This means deeper trees fit the training data extremely well, eventually reaching almost 100% accuracy.
+
+# The orange line shows test accuracy, which represents generalization performance.
+# Test accuracy initially improves when max_depth increases from 1 to about 2,
+# but then it begins to fluctuate and generally decreases as the tree grows deeper.
+# This divergence between high training accuracy and low/unstable test accuracy shows overfitting.
+
+# In particular, when max_depth reaches around 7 or more,
+# the training accuracy becomes nearly perfect while test accuracy drops a lot.
+
+# Shallow trees (max_depth of 2–3) give the best balance.
 
 # --------------------------------------------------------------------------------
 # PART 5.4: Investigating the Effect of min_samples_split
 # --------------------------------------------------------------------------------
 
+# We define a list of possible values for the hyperparameter min_samples_split.
+# This parameter controls the minimum number of samples required in a node
+# before the decision tree is allowed to split it.
+# Lower values (like 2) allow very deep trees (more overfitting).
+# Higher values force simpler trees with fewer splits (less overfitting, more bias).
 min_splits = [2, 5, 10, 20, 30, 40, 50, 60, 75, 100]
+
+# We prepare lists to store training and test accuracy for each min_samples_split setting.
 train_accuracies = []
 test_accuracies = []
 
+# For each value of min_samples_split, we create, train, and evaluate a decision tree.
 for min_split in min_splits:
+
+    # Create the decision tree with the current hyperparameter setting.
     dt = DecisionTreeClassifier(min_samples_split=min_split, random_state=42)
+
+    # Fit (train) the tree on the training dataset.
     dt.fit(X_train, Y_train)
 
+    # Evaluate accuracy on the training set.
     train_accuracies.append(accuracy_score(Y_train, dt.predict(X_train)))
+
+    # Evaluate accuracy on the test set.
+    # The test accuracy helps us see which values generalize best.
     test_accuracies.append(accuracy_score(Y_test, dt.predict(X_test)))
 
-# Create DataFrame for visualization
+# We convert the results into a DataFrame for plotting with seaborn.
 min_split_results = pd.DataFrame({
     'min_samples_split': min_splits,
     'train': train_accuracies,
     'test': test_accuracies
 })
 
-# Plot results
+# We plot the training and test accuracy curves across all min_samples_split values.
 plt.figure(figsize=(10, 6))
-sns.lineplot(data=min_split_results.melt('min_samples_split', var_name='set', value_name='accuracy'),
-             x='min_samples_split', y='accuracy', hue='set', marker='o')
+
+# Melt the DataFrame so seaborn can plot both curves with one command as taught in our Machine Learning lab.
+sns.lineplot(
+    data=min_split_results.melt('min_samples_split', var_name='set', value_name='accuracy'),
+    x='min_samples_split', y='accuracy', hue='set', marker='o'
+)
+
 plt.xlabel('Minimum Samples to Split')
 plt.ylabel('Accuracy')
 plt.title('Effect of min_samples_split on Model Performance')
-plt.legend(title='Dataset')
+plt.legend(title='Dataset')                  # train vs test lines
 plt.grid(True, alpha=0.3)
 plt.tight_layout()
 plt.savefig("ml_min_samples_split_effect.pdf", format="pdf", bbox_inches="tight")
 plt.show()
+
+# The graph shows how changing the min_samples_split hyperparameter influences
+# training accuracy (blue line) and test accuracy (orange line).
+
+# When min_samples_split is very small (2 or 5), it produces a very deep tree with many splits,
+# which leads to extremely high training accuracy (almost 100%) but relatively low test accuracy.
+# This behavior is characteristic of overfitting.
+
+# As min_samples_split increases (20–60), this reduces the model’s ability to memorize the
+# training data. At the same time, test accuracy becomes more stable and slightly improves.
+#
+# With very large values (75 or 100), the model is simple and no longer overfits. It underfits
 
 #--------------------------------------------------------------------------------
 # PART 5.5: Automatic Model Selection with GridSearchCV
@@ -1796,6 +2052,39 @@ print("Best validation score: {:.4f}".format(dt_res.best_score_))
 test_accuracy = accuracy_score(Y_test, dt_res.predict(X_test))
 print("Test accuracy: {:.2f}%\n".format(test_accuracy * 100))
 
+# We use GridSearchCV to automatically identify the best-performing
+# Decision Tree model by testing different combinations of
+# hyperparameters.
+
+# We begin by creating a StratifiedShuffleSplit object, which produces a validation
+# split that preserves the proportion of successful and unsuccessful students. This
+# is important because the target variable (success) is not perfectly balanced.
+# The split uses 75% of the data for training and 25% for validation, and the
+# random_state is for reproducibility. This comes from our lab.
+
+# Next, we construct a parameter grid specifying the combinations of
+# max_depth and min_samples_split that we want to evaluate.
+
+# We then create a GridSearchCV object, which evaluates each parameter combination
+# using the stratified validation split. The process fits many different trees,
+# each with its own parameter settings, and records their validation accuracy.
+# Our teacher told us that using n_jobs=-1 instructs GridSearchCV to run
+# computations using all available CPU cores to speed up the search.
+
+# After fitting the grid search, we convert the results into a DataFrame so that we
+# can visualize the mean validation accuracy for each hyperparameter combination.
+# We reshape the DataFrame into a matrix where the rows correspond to max_depth
+# values and the columns correspond to min_samples_split values. We then plot
+# these values using a heatmap.
+
+# The heatmap shows that the strongest performance is achieved at a relatively
+# shallow tree depth. In particular, the combination max_depth = 3 and
+# min_samples_split = 2 produces the highest validation accuracy.
+
+# GridSearchCV reports that the best validation score is approximately 72.13%.
+# The tuned model achieves a test accuracy of about 60.95%,
+# which is higher than the default decision tree’s test accuracy.
+
 #--------------------------------------------------------------------------------
 # PART 5.6: Visualize the Final Decision Tree
 #--------------------------------------------------------------------------------
@@ -1818,7 +2107,7 @@ plt.tight_layout()
 plt.savefig("ml_final_decision_tree.pdf", format="pdf", bbox_inches="tight")
 plt.show()
 
-""" GINI IMPURITY 
+print(""" GINI IMPURITY 
 from 0 to 0.5 (for binary classification)
 measures how "mixed" or "impure" the node is
 gini = 0: Perfectly pure (all samples are the same class)
@@ -1831,9 +2120,43 @@ the meaning is [number of Failed students, number of Passed students] at this no
 for example, 79 students failed, 165 students passed """
 
 """ CLASS
-determined by majority vote"""
+determined by majority vote""")
 
 # After visualizing the tree
 from sklearn.metrics import confusion_matrix
 cm = confusion_matrix(Y_test, dt_res.predict(X_test))
 print(cm)
+
+# This step uses the best estimator returned by dt_res.best_estimator_, which means that the tree being plotted
+# corresponds to the combination of hyperparameters that achieved the highest validation accuracy
+# in the grid search process performed earlier.
+
+# The plot_tree() function is used to produce a graphical representation of the optimized decision tree.
+# Each internal node displays a splitting rule and observations that satisfy
+# the condition follow the left branch while the others follow the right branch.
+
+# In this model, the first and most important split occurs on the variable Go_Out, which indicates
+# that going-out frequency is the strongest predictor of final success among all available features.
+# Additional splits involve variables such as sex, absences, relationship quality with family, age,
+# and weekend alcohol consumption.
+
+# The nodes use color shading to indicate the predicted class, with blue nodes representing a prediction of “Passed”
+# and orange nodes representing a prediction of “Failed.” Darker colors indicate lower Gini impurity, meaning the node
+# contains a more homogeneous group of observations. The Gini impurity displayed in each node measures how mixed the
+# observations are: a value close to 0 indicates that all observations belong to the same class, while values closer
+# to 0.5 indicate an even mix of the two classes.
+
+# Each node also displays a “value”, which indicates how many samples  of each class reach that node.
+# The “class” label is the majority class at that node. For example, if a node  shows value = [79, 165],
+# it means 79 students failed and 165 passed, and the node’s predicted class is “Passed.”
+
+# After plotting the tree, we compute a confusion matrix using the test set predictions. The confusion matrix
+# compares true outcomes with the model’s predictions, using the convention that row 0 corresponds to Failed
+# and row 1 corresponds to Passed. The resulting matrix is:
+# [[11 23]
+#  [18 53]]
+
+# This matrix indicates that 11 students who truly failed were correctly predicted as failed (true negatives),
+# while 23 students who truly failed were incorrectly predicted as passed (false positives).
+# The model incorrectly classified 18 students who passed as failed (false negatives), and correctly classified
+# 53 passing students as passed (true positives).

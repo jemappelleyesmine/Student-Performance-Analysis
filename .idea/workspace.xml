@@ -12,16 +12,27 @@
       <change beforePath="$PROJECT_DIR$/age_distribution.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/age_distribution.pdf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/alcohol_consumption_distribution.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/alcohol_consumption_distribution.pdf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/correlation_heatmap_full.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/correlation_heatmap_full.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/factor_impact_comparison.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/factor_impact_comparison.pdf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/family_support_distribution.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/family_support_distribution.pdf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/gender_distribution.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/gender_distribution.pdf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/goout_vs_health_distribution.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/goout_vs_health_distribution.pdf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internet_access_distribution.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/internet_access_distribution.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ml_final_decision_tree.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/ml_final_decision_tree.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ml_grid_search_heatmap.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/ml_grid_search_heatmap.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ml_max_depth_effect.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/ml_max_depth_effect.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ml_min_samples_split_effect.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/ml_min_samples_split_effect.pdf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/paid_classes_distribution.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/paid_classes_distribution.pdf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/parent_jobs_comparison.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/parent_jobs_comparison.pdf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/school_support_distribution.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/school_support_distribution.pdf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/student-analysis-project.py" beforeDir="false" afterPath="$PROJECT_DIR$/student-analysis-project.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/study_time_distribution.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/study_time_distribution.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/success_by_absences.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/success_by_absences.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/success_by_alcohol.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/success_by_alcohol.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/success_by_famrel.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/success_by_famrel.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/success_by_goout.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/success_by_goout.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/success_by_internet.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/success_by_internet.pdf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/success_by_parent_job.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/success_by_parent_job.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/success_by_studytime.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/success_by_studytime.pdf" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
