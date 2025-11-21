@@ -1,6 +1,9 @@
 # Student-Performance-Analysis
 Analysis of student performance data using Python
 
+Note: Aashish sent me his part of the code and also the parts he reviewed and I was the one to put it on Github.
+Also, some of the code (heatmap and machine learning part) comes from our Machine Learning Lab solution pdf files. So all of this must be credited to our Machine Learning teacher.
+
 ## Context
 
 A secondary school wants to investigate social, demographic, and school related causes linked to student failure in order to proactively identify students at risk and provide them with adequate counseling and support.
